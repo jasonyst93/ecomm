@@ -9,7 +9,7 @@ const {
   requirePassword,
   requirePasswordConfirmation,
   requireEmailExists,
-  requireValidOasswordForUser
+  requireValidPasswordForUser
 } = require('./validators');
 
 const router = express.Router();
@@ -43,17 +43,19 @@ router.get('/signout', (req, res) => {
 });
 
 router.get('/signin', (req, res) => {
-  res.send(signinTemplate({})); //must pass in empty otherwise -> undefined
+  res.send(signinTemplate({}));
 });
 
 router.post(
   '/signin',
-  [requireEmailExists, requireValidOasswordForUser],
+  [requireEmailExists, requireValidPasswordForUser],
   async (req, res) => {
     const errors = validationResult(req);
+
     if (!errors.isEmpty()) {
-      return res.send(signinTemplate({ errors }))
+      return res.send(signinTemplate({ errors }));
     }
+
     const { email } = req.body;
 
     const user = await usersRepo.getOneBy({ email });

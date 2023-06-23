@@ -2,6 +2,15 @@ const { check } = require('express-validator');
 const usersRepo = require('../../repositories/users');
 
 module.exports = {
+  requireTitle: check('title')
+    .trim()
+    .isLength({ min: 5, max: 40 })
+    .withMessage('Must be between 5 and 40 characters'),
+  requirePrice: check('price')
+    .trim()
+    .toFloat()
+    .isFloat({ min: 1 })
+    .withMessage('Must be a number greater than 1'),
   requireEmail: check('email')
     .trim()
     .normalizeEmail()
@@ -24,8 +33,6 @@ module.exports = {
     .custom((passwordConfirmation, { req }) => {
       if (passwordConfirmation !== req.body.password) {
         throw new Error('Passwords must match');
-      } else {
-        return true
       }
     }),
   requireEmailExists: check('email')
@@ -39,7 +46,7 @@ module.exports = {
         throw new Error('Email not found!');
       }
     }),
-  requireValidOasswordForUser: check('password')
+  requireValidPasswordForUser: check('password')
     .trim()
     .custom(async (password, { req }) => {
       const user = await usersRepo.getOneBy({ email: req.body.email });
@@ -55,4 +62,4 @@ module.exports = {
         throw new Error('Invalid password');
       }
     })
-}
+};
